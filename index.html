@@ -1,0 +1,1367 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Para Laila ♡</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=Quicksand:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ── RESET & BASE ── */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        font-family: "Quicksand", sans-serif;
+      }
+      canvas {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* ── MODAL DE ENTRADA ── */
+      #modal {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #65022d;
+        transition: opacity 1.2s ease;
+      }
+      #modal.oculto {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .card {
+        background: #baaeae;
+        border-radius: 28px;
+        padding: 26px 26px 30px;
+        width: min(360px, 90vw);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        box-shadow: 0 6px 40px rgba(220, 72, 124, 0.2);
+      }
+
+      /* Contador de dias */
+      .card-counter {
+        font-family: "Quicksand", sans-serif;
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: rgba(100, 0, 40, 0.7);
+        margin-bottom: 14px;
+        background: rgba(255, 255, 255, 0.45);
+        padding: 6px 18px;
+        border-radius: 50px;
+      }
+      .card-counter span {
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #65022d;
+      }
+
+      .card-img-wrap {
+        width: 100%;
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 18px;
+        aspect-ratio: 4/3;
+        background: #1c013a;
+        position: relative;
+      }
+      .card-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border-radius: 14px;
+        transition: transform 0.4s ease;
+      }
+      .card-img-wrap img:hover {
+        transform: scale(1.03);
+      }
+
+      .card-quote {
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-weight: 400;
+        font-size: clamp(1.1rem, 4.2vw, 1.3rem);
+        color: #1a1a2e;
+        text-align: center;
+        line-height: 1.5;
+        margin-bottom: 8px;
+      }
+      .card-sub {
+        font-size: 0.6rem;
+        font-weight: 600;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        color: rgba(180, 80, 140, 0.55);
+        margin-bottom: 22px;
+      }
+
+      #btn-entrar {
+        width: 100%;
+        font-family: "Quicksand", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        padding: 1rem 0;
+        background: #fff;
+        color: #e0306a;
+        border: 1.5px solid #e0306a;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      #btn-entrar:hover {
+        background: #fdf0f4;
+        transform: scale(1.02);
+      }
+      #btn-entrar .heart {
+        font-size: 0.9rem;
+        animation: pulse 1.4s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.25);
+        }
+      }
+
+      /* ── TEXTO SUPERIOR FLUTUANTE ── */
+      .top-text {
+        position: fixed;
+        top: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-size: clamp(1.1rem, 3.5vw, 1.9rem);
+        color: rgba(255, 210, 235, 0.85);
+        z-index: 10;
+        pointer-events: none;
+        white-space: nowrap;
+        text-shadow: 0 0 28px rgba(255, 100, 180, 0.55);
+        display: none;
+        animation: fadeInDown 1.5s ease forwards;
+      }
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
+
+      /* ── BOTÕES FLUTUANTES ── */
+      .fab-area {
+        position: fixed;
+        bottom: 24px;
+        right: 20px;
+        display: none;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+        z-index: 100;
+      }
+      .fab {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+        backdrop-filter: blur(8px);
+      }
+      .fab:hover {
+        transform: scale(1.12);
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55);
+      }
+      .fab-carta {
+        background: rgba(180, 50, 100, 0.85);
+      }
+      .fab-galeria {
+        background: rgba(100, 2, 45, 0.85);
+      }
+
+      /* ── MODAL GENÉRICO (carta / galeria) ── */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 8000;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+      }
+      .overlay.ativo {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      /* ── MODAL CARTA ── */
+      .modal-carta {
+        background: #fdf0f4;
+        border-radius: 20px;
+        width: min(520px, 92vw);
+        max-height: 82vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 12px 50px rgba(100, 0, 40, 0.35);
+        overflow: hidden;
+      }
+      .modal-carta-header {
+        padding: 22px 28px 14px;
+        border-bottom: 1px solid rgba(200, 80, 120, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .modal-carta-titulo {
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-size: 1.35rem;
+        color: #65022d;
+      }
+      .btn-fechar {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.3rem;
+        color: rgba(100, 2, 45, 0.5);
+        transition: color 0.2s;
+        padding: 4px;
+      }
+      .btn-fechar:hover {
+        color: #65022d;
+      }
+      .modal-carta-corpo {
+        padding: 24px 28px 28px;
+        overflow-y: auto;
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-size: clamp(1rem, 3vw, 1.15rem);
+        line-height: 1.8;
+        color: #2a0a18;
+      }
+      .modal-carta-corpo p {
+        margin-bottom: 1em;
+      }
+      .modal-carta-corpo .assinatura {
+        margin-top: 1.5em;
+        font-weight: 400;
+        color: #65022d;
+        font-size: 1.1em;
+      }
+
+      /* ── MODAL GALERIA ── */
+      .modal-galeria {
+        background: #0d0010;
+        border-radius: 20px;
+        width: min(680px, 95vw);
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 12px 50px rgba(100, 0, 40, 0.55);
+        overflow: hidden;
+      }
+      .galeria-header {
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(200, 80, 120, 0.2);
+      }
+      .galeria-titulo {
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-size: 1.2rem;
+        color: rgba(255, 210, 235, 0.9);
+      }
+      .galeria-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 8px;
+        padding: 16px;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .galeria-item {
+        aspect-ratio: 1;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
+        background: #1c013a;
+      }
+      .galeria-item:hover {
+        border-color: #e0306a;
+        transform: scale(1.03);
+      }
+      .galeria-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .galeria-legenda {
+        font-size: 0.65rem;
+        text-align: center;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255, 180, 220, 0.35);
+        padding: 12px;
+      }
+
+      /* ── LIGHTBOX ── */
+      .lightbox {
+        position: fixed;
+        inset: 0;
+        z-index: 9000;
+        background: rgba(0, 0, 0, 0.92);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+      .lightbox.ativo {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .lightbox img {
+        max-width: 90vw;
+        max-height: 75vh;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 0 40px rgba(255, 100, 180, 0.3);
+      }
+      .lightbox-legenda {
+        margin-top: 14px;
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-size: 1.05rem;
+        color: rgba(255, 210, 235, 0.75);
+        text-align: center;
+      }
+      .lightbox-nav {
+        display: flex;
+        gap: 16px;
+        margin-top: 14px;
+      }
+      .lb-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        font-size: 1.4rem;
+        padding: 6px 18px;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .lb-btn:hover {
+        background: rgba(224, 48, 106, 0.5);
+      }
+
+      #hint {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.6rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: rgba(255, 180, 220, 0.22);
+        pointer-events: none;
+        z-index: 10;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══════════════════════════════════════
+     CONFIGURAÇÃO — edite aqui com facilidade
+     ══════════════════════════════════════ -->
+    <script>
+      // ── DATA DE INÍCIO DO RELACIONAMENTO (AAAA, MM-1, DD + 2) ──
+      const DATA_INICIO = new Date(2026, 2, 24); // Exemplo: 1º de janeiro de 2025
+
+      // ── FOTO DO CARTÃO DE BOAS-VINDAS ──
+      const FOTO_CAPA = "https://i.postimg.cc/wvsBdTzK/Capa-Laila-e-Eu.jpg";
+      const FOTO_FALLBACK =
+        "https://i.postimg.cc/0jcFWDBV/IMG-20260323-WA0016.jpg";
+
+      // ── TEXTO FLUTUANTE APÓS ENTRAR ──
+      const TEXTO_TOPO = 'Laila, você é o meu universo. ❤️ Estou feliz por ter você na minha vida. Te amo muitão!❤️';
+
+      // ── MÚSICA (link direto .mp3) ──
+      const MUSICA_URL =
+        "https://github.com/codeninja543/codeninja5433/raw/refs/heads/main/Umberto%20Tozzi%20-%20Te%20Amo%20(Letra).mp3";
+      const MUSICA_INICIO_SEG = 16; // segundo em que a música começa
+
+      // ── FRASES FLUTUANTES NA GALÁXIA ──
+      const FRASES = [
+        "Te amo",
+        "Você é meu tudo",
+        "Sempre você",
+        "Minha vida",
+        "Meu amor",
+        "Meu céu",
+        "Minha rainha",
+        "Para sempre",
+        "Você é minha paz",
+        "Meu coração",
+        "Você é luz",
+        "Meu anjo",
+        "Preciso de você",
+        "Você é especial",
+        "Minha felicidade",
+        "Você é perfeita",
+        "Meu sonho",
+        "Obrigado por existir",
+        "Loucamente apaixonado",
+        "Com você é tudo",
+        "Você e eu",
+        "Você é o meu mundo",
+        "Eternamente seu",
+        "Você é minha razão",
+        "A cada dia mais",
+        "Sem você não sou",
+        "Você é o meu lar",
+        "Minha Laila",
+      ];
+
+      // ── GALERIA DE FOTOS ──
+      // Adicione quantas fotos quiser: { src: 'link', legenda: 'texto' }
+      const GALERIA = [
+        {
+          src: "https://i.postimg.cc/T1CF7gsX/IMG-20260302-WA0248.jpg",
+          legenda: "Nossa galáxia particular ✨",
+        },
+        {
+          src: "https://i.postimg.cc/vTQCt333/IMG-20260310-WA0048.jpg",
+          legenda: "Foto especial 2 🌸",
+        },
+        {
+          src: "https://i.postimg.cc/LXkrPrBq/IMG-20260317-WA0061.jpg",
+          legenda: "Foto especial 3 💕",
+        },
+        {
+          src:"https://i.postimg.cc/pr23JqqZ/IMG-20260323-WA0005.jpg",
+          legenda: "Foto especial 4 💕",
+        },
+        {
+          src:"https://i.postimg.cc/ZnTXxVVH/IMG-20260323-WA0006.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/NFgZkppN/IMG-20260323-WA0007.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/Jn39X9cD/IMG-20260323-WA0008.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/0jcFWDBV/IMG-20260323-WA0016.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/yxvtQcGq/IMG-20260323-WA0023.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/T1CF7gsv/IMG-20260403-WA0003.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/QCXvJ00y/IMG-20260413-WA0007.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/nr0gRBP6/IMG-20260413-WA0008.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/fyBp2mrg/IMG-20260413-WA0011.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/cCX29wzy/IMG-20260413-WA0012.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/qqjSby5W/IMG-20260413-WA0013.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/GtqV7G5V/IMG-20260413-WA0013-(1).jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/cCX29wb9/IMG-20260413-WA0023.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/fL76d6jV/IMG-20260419-105340467-HDR.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/TwjZbZqp/IMG-20260419-105344232-HDR.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/Jn39X9cm/IMG-20260419-105404431-HDR.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/pTQgjgYX/IMG-20260419-105406629-HDR.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/prq4Gz6S/IMG-20260419-WA0008.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/0j8h0cc7/IMG-20260422-WA0017.jpg",
+          legenda: "",
+        },
+        {
+          src:"https://i.postimg.cc/d3qgj44r/IMG-20260422-WA0018.jpg",
+          legenda: "",
+        },
+      ];
+      // Substitua os links acima pelas suas fotos reais (Postimages, ImgBB, etc.)
+
+      // ── CARTA DE AMOR ──
+      const CARTA = `
+    <p>Laila,</p>
+    <p>Existem palavras que só fazem sentido quando a gente encontra a pessoa certa para dizê-las. Contigo, aprendi que "para sempre" não é uma promessa leve — é uma escolha que renovo todo dia.</p>
+    <p>Há algo de extraordinário em como você transforma os momentos simples. Um café da manhã, uma risada boba, um silêncio compartilhado — com você, tudo tem um peso diferente. Um peso bom, daqueles que a gente não quer largar.</p>
+    <p>Você não apenas entrou na minha vida. Você ficou. E eu, que nunca soube muito bem como guardar coisas importantes, descobri que te guardar é a coisa mais natural do mundo.</p>
+    <p>Este universo aqui — com suas estrelas, seu buraco negro e seu coração flutuando no espaço — é só uma metáfora imperfeita do que sinto. Porque o que sinto por você não cabe nem em galáxias.</p>
+    <p class="assinatura">Com todo o meu amor,<br>Jeanison ♡</p>
+  `;
+    </script>
+
+    <!-- ══════════════════════════════════════ -->
+
+    <!-- Modal de entrada -->
+    <div id="modal">
+      <div class="card">
+        <div class="card-counter">
+          Já são <span id="contador-dias">...</span> dias ao seu lado.
+        </div>
+        <div class="card-img-wrap">
+          <img
+            id="foto-capa"
+            src=""
+            alt="Foto de nós"
+            onerror="this.src = FOTO_FALLBACK"
+          />
+        </div>
+        <div class="card-quote">
+          Com você encontrei o lugar onde quero ficar para sempre 🪐
+        </div>
+        <div class="card-sub">Um universo · só para você</div>
+        <button id="btn-entrar">
+          <span class="heart">♡</span> Toque aqui, Amor
+          <span class="heart">♡</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Texto superior após entrar -->
+    <div class="top-text" id="top-text"></div>
+    <div id="hint">arraste para explorar · pinça para aproximar</div>
+
+    <!-- Canvas 3D -->
+    <canvas id="galaxy"></canvas>
+
+    <!-- Áudio -->
+    <audio id="musica" loop>
+      <source id="audio-src" src="" type="audio/mpeg" />
+    </audio>
+
+    <!-- Botões flutuantes -->
+    <div class="fab-area" id="fab-area">
+      <button class="fab fab-carta" id="btn-carta" title="Carta de amor">
+        💌
+      </button>
+      <button class="fab fab-galeria" id="btn-galeria" title="Nossa galeria">
+        📷
+      </button>
+    </div>
+
+    <!-- Overlay Carta -->
+    <div class="overlay" id="overlay-carta">
+      <div class="modal-carta">
+        <div class="modal-carta-header">
+          <span class="modal-carta-titulo">Uma carta para você ♡</span>
+          <button class="btn-fechar" id="fechar-carta">✕</button>
+        </div>
+        <div class="modal-carta-corpo" id="corpo-carta"></div>
+      </div>
+    </div>
+
+    <!-- Overlay Galeria -->
+    <div class="overlay" id="overlay-galeria">
+      <div class="modal-galeria">
+        <div class="galeria-header">
+          <span class="galeria-titulo">Nossa história em fotos ♡</span>
+          <button
+            class="btn-fechar"
+            id="fechar-galeria"
+            style="color: rgba(255, 200, 230, 0.6)"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="galeria-grid" id="galeria-grid"></div>
+        <div class="galeria-legenda">toque para ampliar</div>
+      </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+      <img id="lb-img" src="" alt="" />
+      <div class="lightbox-legenda" id="lb-legenda"></div>
+      <div class="lightbox-nav">
+        <button class="lb-btn" id="lb-prev">&#8592;</button>
+        <button class="lb-btn" id="lb-close">✕</button>
+        <button class="lb-btn" id="lb-next">&#8594;</button>
+      </div>
+    </div>
+
+    <!-- ── SCRIPT DE INTERFACE ── -->
+    <script>
+      (function () {
+        // Contador de dias
+        const dias = Math.floor((new Date() - DATA_INICIO) / 86400000);
+        document.getElementById("contador-dias").textContent = dias;
+
+        // Foto de capa
+        document.getElementById("foto-capa").src = FOTO_CAPA;
+
+        // Texto topo
+        document.getElementById("top-text").textContent = TEXTO_TOPO;
+
+        // Áudio
+        document.getElementById("audio-src").src = MUSICA_URL;
+
+        // Carta
+        document.getElementById("corpo-carta").innerHTML = CARTA;
+
+        // Galeria
+        const grid = document.getElementById("galeria-grid");
+        GALERIA.forEach((item, i) => {
+          const div = document.createElement("div");
+          div.className = "galeria-item";
+          const img = document.createElement("img");
+          img.src = item.src;
+          img.alt = item.legenda;
+          div.appendChild(img);
+          div.addEventListener("click", () => abrirLightbox(i));
+          grid.appendChild(div);
+        });
+
+        // Botão entrar
+        document.getElementById("btn-entrar").addEventListener("click", () => {
+          const m = document.getElementById("modal");
+          m.classList.add("oculto");
+          setTimeout(() => (m.style.display = "none"), 1200);
+          document.getElementById("top-text").style.display = "block";
+          document.getElementById("fab-area").style.display = "flex";
+          const isMobile = /Mobi|Android|iPhone|iPad/i.test(
+            navigator.userAgent,
+          );
+          if (isMobile) document.getElementById("hint").style.display = "block";
+          const a = document.getElementById("musica");
+          a.currentTime = MUSICA_INICIO_SEG;
+          a.play().catch(() => {});
+        });
+
+        // Carta
+        document.getElementById("btn-carta").addEventListener("click", () => {
+          document.getElementById("overlay-carta").classList.add("ativo");
+        });
+        document
+          .getElementById("fechar-carta")
+          .addEventListener("click", () => {
+            document.getElementById("overlay-carta").classList.remove("ativo");
+          });
+        document
+          .getElementById("overlay-carta")
+          .addEventListener("click", (e) => {
+            if (e.target === e.currentTarget)
+              e.currentTarget.classList.remove("ativo");
+          });
+
+        // Galeria
+        document.getElementById("btn-galeria").addEventListener("click", () => {
+          document.getElementById("overlay-galeria").classList.add("ativo");
+        });
+        document
+          .getElementById("fechar-galeria")
+          .addEventListener("click", () => {
+            document
+              .getElementById("overlay-galeria")
+              .classList.remove("ativo");
+          });
+        document
+          .getElementById("overlay-galeria")
+          .addEventListener("click", (e) => {
+            if (e.target === e.currentTarget)
+              e.currentTarget.classList.remove("ativo");
+          });
+
+        // Lightbox
+        let lbIdx = 0;
+        function abrirLightbox(i) {
+          lbIdx = i;
+          atualizarLightbox();
+          document.getElementById("lightbox").classList.add("ativo");
+        }
+        function atualizarLightbox() {
+          document.getElementById("lb-img").src = GALERIA[lbIdx].src;
+          document.getElementById("lb-legenda").textContent =
+            GALERIA[lbIdx].legenda;
+        }
+        document.getElementById("lb-prev").addEventListener("click", () => {
+          lbIdx = (lbIdx - 1 + GALERIA.length) % GALERIA.length;
+          atualizarLightbox();
+        });
+        document.getElementById("lb-next").addEventListener("click", () => {
+          lbIdx = (lbIdx + 1) % GALERIA.length;
+          atualizarLightbox();
+        });
+        document.getElementById("lb-close").addEventListener("click", () => {
+          document.getElementById("lightbox").classList.remove("ativo");
+        });
+
+        // Fechar lightbox com Escape
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            document.getElementById("lightbox").classList.remove("ativo");
+            document.getElementById("overlay-carta").classList.remove("ativo");
+            document
+              .getElementById("overlay-galeria")
+              .classList.remove("ativo");
+          }
+        });
+      })();
+    </script>
+
+    <!-- ── THREE.JS IMPORTMAP ── -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <!-- ── CENA 3D ── -->
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+
+      const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("galaxy"),
+        antialias: !isMobile,
+        alpha: true,
+        powerPreference: "high-performance",
+      });
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, isMobile ? 1.5 : 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 0.9;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        60,
+        innerWidth / innerHeight,
+        0.1,
+        200000,
+      );
+      camera.position.set(0, isMobile ? 180 : 200, isMobile ? 1100 : 700);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.055;
+      controls.minDistance = 60;
+      controls.maxDistance = Infinity;
+      controls.zoomSpeed = isMobile ? 1.4 : 1.1;
+      controls.rotateSpeed = isMobile ? 0.55 : 0.9;
+      controls.enablePan = false;
+      controls.minPolarAngle = Math.PI * 0.2;
+      controls.maxPolarAngle = Math.PI * 0.8;
+      controls.touches = {
+        ONE: THREE.TOUCH.ROTATE,
+        TWO: THREE.TOUCH.DOLLY_PAN,
+      };
+
+      const composer = new EffectComposer(renderer);
+      composer.addPass(new RenderPass(scene, camera));
+      const bloom = new UnrealBloomPass(
+        new THREE.Vector2(innerWidth, innerHeight),
+      );
+      bloom.threshold = 0.65;
+      bloom.strength = 0.42;
+      bloom.radius = 0.3;
+      composer.addPass(bloom);
+
+      const col = new THREE.Color();
+
+      // Campo de estrelas de fundo
+      (function () {
+        const n = isMobile ? 1200 : 2500;
+        const pos = new Float32Array(n * 3),
+          color = new Float32Array(n * 3);
+        for (let i = 0; i < n; i++) {
+          const i3 = i * 3;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          const r = 12000 + Math.random() * 60000;
+          pos[i3] = r * Math.sin(phi) * Math.cos(theta);
+          pos[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+          pos[i3 + 2] = r * Math.cos(phi);
+          const t = Math.random();
+          if (t < 0.55) col.setHSL(0.08, 0.05, 0.9 + Math.random() * 0.1);
+          else col.setHSL(0.0, 0.0, 0.95);
+          color[i3] = col.r;
+          color[i3 + 1] = col.g;
+          color[i3 + 2] = col.b;
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+        g.setAttribute("color", new THREE.BufferAttribute(color, 3));
+        scene.add(
+          new THREE.Points(
+            g,
+            new THREE.PointsMaterial({
+              size: isMobile ? 1.8 : 2.4,
+              vertexColors: true,
+              blending: THREE.AdditiveBlending,
+              transparent: true,
+              opacity: 0.65,
+              depthWrite: false,
+            }),
+          ),
+        );
+      })();
+
+      let galaxyMesh, armsMesh;
+
+      // Galáxia principal (65.000 estrelas em 5 braços espirais)
+      (function () {
+        const n = isMobile ? 35000 : 65000;
+        const pos = new Float32Array(n * 3),
+          color = new Float32Array(n * 3);
+        const ARMS = 5,
+          SPIN = 4.5,
+          SPREAD = 0.38,
+          H = 55;
+        for (let i = 0; i < n; i++) {
+          const i3 = i * 3;
+          const arm = i % ARMS;
+          const t = Math.pow(Math.random(), 0.55);
+          const rad = 60 + t * 980;
+          const baseAng = (arm / ARMS) * Math.PI * 2;
+          const spinAng = t * SPIN;
+          const scatter = (Math.random() - 0.5) * SPREAD * (1 + t * 1.5);
+          pos[i3] = Math.cos(baseAng + spinAng + scatter) * rad;
+          pos[i3 + 1] = (Math.random() - 0.5) * H * Math.exp(-rad / 500);
+          pos[i3 + 2] = Math.sin(baseAng + spinAng + scatter) * rad;
+          const nt = rad / 1050;
+          if (nt < 0.1) col.setHSL(0.05, 0.15, 0.96);
+          else if (nt < 0.3)
+            col.setHSL(
+              0.93 + Math.random() * 0.04,
+              0.8,
+              0.78 + Math.random() * 0.12,
+            );
+          else if (nt < 0.6)
+            col.setHSL(
+              0.95 + Math.random() * 0.04,
+              0.85,
+              0.62 + Math.random() * 0.15,
+            );
+          else
+            col.setHSL(
+              0.88 + Math.random() * 0.06,
+              0.9,
+              0.48 + Math.random() * 0.18,
+            );
+          color[i3] = col.r;
+          color[i3 + 1] = col.g;
+          color[i3 + 2] = col.b;
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+        g.setAttribute("color", new THREE.BufferAttribute(color, 3));
+        galaxyMesh = new THREE.Points(
+          g,
+          new THREE.PointsMaterial({
+            size: isMobile ? 1.6 : 2.1,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            depthWrite: false,
+            opacity: 0.92,
+          }),
+        );
+        scene.add(galaxyMesh);
+      })();
+
+      // Braços espirais destacados
+      (function () {
+        const n = isMobile ? 6000 : 11000;
+        const pos = new Float32Array(n * 3),
+          color = new Float32Array(n * 3);
+        for (let i = 0; i < n; i++) {
+          const i3 = i * 3,
+            t = i / n,
+            arm = i % 5,
+            base = (arm / 5) * Math.PI * 2;
+          const r = 70 + t * 960,
+            ang = base + t * Math.PI * 4.2;
+          pos[i3] = Math.cos(ang) * r;
+          pos[i3 + 1] = (Math.random() - 0.5) * 10;
+          pos[i3 + 2] = Math.sin(ang) * r;
+          col.setHSL(
+            0.94 + Math.random() * 0.04,
+            0.25,
+            0.92 + Math.random() * 0.08,
+          );
+          color[i3] = col.r;
+          color[i3 + 1] = col.g;
+          color[i3 + 2] = col.b;
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+        g.setAttribute("color", new THREE.BufferAttribute(color, 3));
+        armsMesh = new THREE.Points(
+          g,
+          new THREE.PointsMaterial({
+            size: isMobile ? 2.5 : 3.2,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            depthWrite: false,
+          }),
+        );
+        scene.add(armsMesh);
+      })();
+
+      // Buraco negro central
+      scene.add(
+        new THREE.Mesh(
+          new THREE.SphereGeometry(42, 64, 64),
+          new THREE.MeshBasicMaterial({ color: 0x000000 }),
+        ),
+      );
+
+      // Halo pulsante do buraco negro
+      const haloMat = new THREE.ShaderMaterial({
+        uniforms: { uTime: { value: 0 } },
+        vertexShader: `varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+        fragmentShader: `uniform float uTime;varying vec3 vN;
+    void main(){
+      float rim=1.-max(dot(vN,vec3(0,0,1)),0.);
+      rim=pow(rim,3.0);float p=0.78+0.18*sin(uTime*1.8);
+      vec3 c=mix(vec3(.28,.0,.12),vec3(.95,.28,.62),rim)*rim*p;
+      gl_FragColor=vec4(c,rim*0.48);
+    }`,
+        transparent: true,
+        side: THREE.FrontSide,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      });
+      scene.add(new THREE.Mesh(new THREE.SphereGeometry(53, 64, 64), haloMat));
+
+      // Discos de acreção (matéria em espiral)
+      function mkDisk(inner, outer, c1, c2, c3, op, rx) {
+        const mat = new THREE.ShaderMaterial({
+          uniforms: {
+            uTime: { value: 0 },
+            uIn: { value: inner },
+            uOut: { value: outer },
+            uC1: { value: new THREE.Color(c1) },
+            uC2: { value: new THREE.Color(c2) },
+            uC3: { value: new THREE.Color(c3) },
+          },
+          vertexShader: `varying vec3 vP;void main(){vP=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+          fragmentShader: `uniform float uTime,uIn,uOut;uniform vec3 uC1,uC2,uC3;varying vec3 vP;
+      float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      void main(){
+        float r=length(vP.xy);float t=clamp((r-uIn)/(uOut-uIn),0.,1.);
+        vec3 c=t<.4?mix(uC1,uC2,t/.4):mix(uC2,uC3,(t-.4)/.6);
+        float ang=atan(vP.y,vP.x);float sw=h(vec2(r*.1,ang+uTime*.25))*.22;
+        float glow=(1.-t)*(1.-t)*1.1+sw*.25;
+        float a=(1.-t)*(1.-t*t)*${op.toFixed(2)}+sw*.08;
+        gl_FragColor=vec4(c*glow,clamp(a,0.,1.));
+      }`,
+          side: THREE.DoubleSide,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        const m = new THREE.Mesh(
+          new THREE.RingGeometry(inner, outer, 256, 8),
+          mat,
+        );
+        m.rotation.x = rx;
+        scene.add(m);
+        return mat;
+      }
+      const dM1 = mkDisk(
+        48,
+        165,
+        "#FFFFFF",
+        "#FFB8D8",
+        "#880044",
+        0.6,
+        Math.PI / 2,
+      );
+      const dM2 = mkDisk(
+        56,
+        132,
+        "#FFD6E8",
+        "#E8508A",
+        "#3D001A",
+        0.32,
+        Math.PI / 2 + 0.13,
+      );
+      const dM3 = mkDisk(
+        165,
+        295,
+        "#FF8CB8",
+        "#AA0050",
+        "#000000",
+        0.16,
+        Math.PI / 2,
+      );
+
+      // Jatos relativísticos
+      function mkJet(dir) {
+        const mat = new THREE.ShaderMaterial({
+          uniforms: { uTime: { value: 0 } },
+          vertexShader: `varying vec2 vU;void main(){vU=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+          fragmentShader: `uniform float uTime;varying vec2 vU;
+      void main(){
+        float f=pow(1.-vU.y,2.)*(1.-vU.x*2.);float p=.6+.28*sin(uTime*3.8+vU.y*9.);
+        vec3 c=mix(vec3(1.,.72,.88),vec3(.72,.0,.38),vU.y);
+        gl_FragColor=vec4(c*p,f*0.32);
+      }`,
+          transparent: true,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        const m = new THREE.Mesh(
+          new THREE.ConeGeometry(8, 225, 32, 1, true),
+          mat,
+        );
+        m.position.y = dir * 112;
+        m.rotation.x = dir > 0 ? 0 : Math.PI;
+        scene.add(m);
+        return mat;
+      }
+      const jM1 = mkJet(1),
+        jM2 = mkJet(-1);
+
+      // Partículas orbitando o disco
+      const pN = 300;
+      const pGeo = new THREE.BufferGeometry(),
+        pBuf = new Float32Array(pN * 3),
+        pA = [],
+        pR = [];
+      for (let i = 0; i < pN; i++) {
+        const a = Math.random() * Math.PI * 2,
+          r = 52 + Math.random() * 210;
+        pA.push(a);
+        pR.push(r);
+        pBuf[i * 3] = Math.cos(a) * r;
+        pBuf[i * 3 + 1] = (Math.random() - 0.5) * 7;
+        pBuf[i * 3 + 2] = Math.sin(a) * r;
+      }
+      pGeo.setAttribute("position", new THREE.BufferAttribute(pBuf, 3));
+      const diskPts = new THREE.Points(
+        pGeo,
+        new THREE.PointsMaterial({
+          color: 0xffb0d0,
+          size: 2.0,
+          transparent: true,
+          opacity: 0.85,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+      );
+      scene.add(diskPts);
+
+      // Coração de partículas (equação paramétrica)
+      function hXY(t) {
+        return {
+          x: 16 * Math.pow(Math.sin(t), 3),
+          y:
+            13 * Math.cos(t) -
+            5 * Math.cos(2 * t) -
+            2 * Math.cos(3 * t) -
+            Math.cos(4 * t),
+        };
+      }
+      const hN = isMobile ? 5000 : 8000,
+        hP = new Float32Array(hN * 3),
+        hC = new Float32Array(hN * 3);
+      for (let i = 0; i < hN; i++) {
+        const i3 = i * 3,
+          t = Math.random() * Math.PI * 2,
+          s = 0.45 + Math.random() * 0.55,
+          p = hXY(t);
+        hP[i3] = p.x * s * 3.8;
+        hP[i3 + 1] = p.y * s * 3.8;
+        hP[i3 + 2] = (Math.random() - 0.5) * 12;
+        const d = Math.sqrt(p.x * p.x + p.y * p.y) / 22;
+        const hue = 0.94 - d * 0.04;
+        const lig = d < 0.25 ? 0.9 - d * 0.55 : 0.62 - d * 0.05;
+        col.setHSL(hue, 0.95, Math.max(lig, 0.4));
+        hC[i3] = col.r;
+        hC[i3 + 1] = col.g;
+        hC[i3 + 2] = col.b;
+      }
+      const hGeo = new THREE.BufferGeometry();
+      hGeo.setAttribute("position", new THREE.BufferAttribute(hP, 3));
+      hGeo.setAttribute("color", new THREE.BufferAttribute(hC, 3));
+      const heart = new THREE.Points(
+        hGeo,
+        new THREE.PointsMaterial({
+          size: isMobile ? 2.1 : 2.6,
+          vertexColors: true,
+          blending: THREE.NormalBlending,
+          transparent: true,
+          depthWrite: false,
+          opacity: 0.97,
+        }),
+      );
+      heart.position.y = isMobile ? 100 : 135;
+      scene.add(heart);
+
+      // Frases flutuantes — lidas da configuração global
+      const phrases = window.FRASES || ["Te amo", "Você é tudo", "Para sempre"];
+      const sC = [
+        { fill: "#FF69B4", sh: "#C2185B" },
+        { fill: "#FF1493", sh: "#880E4F" },
+        { fill: "#FFB6C1", sh: "#E91E8C" },
+        { fill: "#FFFFFF", sh: "#E91E8C" },
+        { fill: "#FFD6EC", sh: "#C2185B" },
+        { fill: "#FF85C2", sh: "#AD1457" },
+      ];
+      function mkSpr(txt, cd) {
+        const cv = document.createElement("canvas");
+        cv.width = 1100;
+        cv.height = 240;
+        const cx = cv.getContext("2d");
+        cx.font = "bold 105px 'Quicksand',sans-serif";
+        cx.strokeStyle = "rgba(0,0,0,0.55)";
+        cx.lineWidth = 8;
+        cx.lineJoin = "round";
+        cx.strokeText(txt, 550, 122);
+        cx.shadowColor = cd.sh;
+        cx.shadowBlur = 28;
+        cx.fillStyle = cd.fill;
+        cx.textAlign = "center";
+        cx.textBaseline = "middle";
+        cx.fillText(txt, 550, 122);
+        cx.shadowBlur = 10;
+        cx.fillText(txt, 550, 122);
+        return new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: new THREE.CanvasTexture(cv),
+            transparent: true,
+            blending: THREE.NormalBlending,
+            depthWrite: false,
+          }),
+        );
+      }
+      const tGrp = new THREE.Group();
+      scene.add(tGrp);
+      const sMs = [];
+      const sprW = isMobile ? 170 : 145,
+        sprH = isMobile ? 39 : 33;
+      for (let i = 0; i < 80; i++) {
+        const cd = sC[i % sC.length],
+          sp = mkSpr(phrases[i % phrases.length], cd);
+        const arm = i % 5,
+          base = (arm / 5) * Math.PI * 2,
+          t2 = i / 80;
+        const r = 160 + t2 * 820,
+          ang = base + t2 * Math.PI * 4.2;
+        const ySpread = isMobile ? 55 : 110;
+        sp.position.set(
+          Math.cos(ang) * r,
+          (Math.random() - 0.5) * ySpread,
+          Math.sin(ang) * r,
+        );
+        sp.scale.set(sprW, sprH, 1);
+        sp.material.opacity = 0.0;
+        tGrp.add(sp);
+        sMs.push(sp.material);
+      }
+
+      // Emojis flutuantes
+      const emojis = [
+        "💖",
+        "💕",
+        "🌸",
+        "🌷",
+        "🌺",
+        "💗",
+        "✨",
+        "💫",
+        "🌹",
+      ];
+      const eGrp = new THREE.Group();
+      scene.add(eGrp);
+      function mkEmoji(e) {
+        const cv = document.createElement("canvas");
+        cv.width = 256;
+        cv.height = 256;
+        const cx = cv.getContext("2d");
+        cx.font = "195px 'Segoe UI Emoji','Apple Color Emoji',sans-serif";
+        cx.textAlign = "center";
+        cx.textBaseline = "middle";
+        cx.fillText(e, 128, 150);
+        const t = new THREE.CanvasTexture(cv);
+        t.colorSpace = THREE.SRGBColorSpace;
+        return new THREE.Mesh(
+          new THREE.PlaneGeometry(52, 52),
+          new THREE.MeshBasicMaterial({
+            map: t,
+            transparent: true,
+            alphaTest: 0.04,
+            depthWrite: false,
+          }),
+        );
+      }
+      for (let i = 0; i < 24; i++) {
+        const m = mkEmoji(emojis[i % emojis.length]);
+        const a = (i / 24) * Math.PI * 2,
+          r = 195 + Math.random() * 620;
+        m.position.set(
+          Math.cos(a) * r,
+          (Math.random() - 0.5) * 115,
+          Math.sin(a) * r,
+        );
+        eGrp.add(m);
+      }
+
+      // Iluminação
+      scene.add(new THREE.AmbientLight(0xffe8f8, 0.28));
+      const pl = new THREE.PointLight(0xff70b0, 2.8, 430);
+      scene.add(pl);
+
+      // Responsividade
+      window.addEventListener("resize", () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+        composer.setSize(innerWidth, innerHeight);
+      });
+
+      // Loop principal de animação
+      const clock = new THREE.Clock();
+      function loop() {
+        requestAnimationFrame(loop);
+        const t = clock.getElapsedTime();
+        galaxyMesh.rotation.y = t * 0.022;
+        armsMesh.rotation.y = t * 0.022;
+        tGrp.rotation.y = t * 0.016;
+        eGrp.rotation.y = t * 0.01;
+        eGrp.children.forEach((m) => m.lookAt(camera.position));
+        heart.rotation.y += 0.0035;
+        heart.position.y = (isMobile ? 100 : 135) + Math.sin(t * 1.7) * 7;
+        const pa = diskPts.geometry.attributes.position.array;
+        for (let i = 0; i < pN; i++) {
+          const sp = 0.28 + pR[i] * 0.00085,
+            ang = pA[i] + t * sp;
+          pa[i * 3] = Math.cos(ang) * pR[i];
+          pa[i * 3 + 2] = Math.sin(ang) * pR[i];
+        }
+        diskPts.geometry.attributes.position.needsUpdate = true;
+        haloMat.uniforms.uTime.value = t;
+        dM1.uniforms.uTime.value = t;
+        dM2.uniforms.uTime.value = t;
+        dM3.uniforms.uTime.value = t;
+        jM1.uniforms.uTime.value = t;
+        jM2.uniforms.uTime.value = t;
+        sMs.forEach((m, i) => {
+          const tgt = 0.88 + Math.sin(t * 1.4 + i) * 0.1;
+          m.opacity = THREE.MathUtils.lerp(m.opacity, tgt, 0.022);
+        });
+        pl.intensity = 2.5 + Math.sin(t * 2.8) * 0.55;
+        controls.update();
+        composer.render();
+      }
+      loop();
+    </script>
+  </body>
+</html>
